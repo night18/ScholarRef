@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+local_settings.py
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+node_modules/
