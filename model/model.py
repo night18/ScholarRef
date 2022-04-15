@@ -233,8 +233,8 @@ except Exception as e:
 
 	
 # Siamese_test = concept_encoder()
-predictions = Siamese_test.predict(["Model transparency might hinder users' ability to recognize the model’s serious error."])
-print(predictions)
+# predictions = Siamese_test.predict(["Model transparency might hinder users' ability to recognize the model’s serious error."])
+# print(predictions)
 
 # abs_predictions = Siamese_test.predict(["With machine learning models being increasingly used to aid decision making even in high-stakes domains, there has been a growing interest in developing interpretable models. Although many supposedly interpretable models have been proposed, there have been relatively few experimental studies investigating whether these models achieve their intended effects, such as making people more closely follow a model’s predictions when it is beneficial for them to do so or enabling them to detect when a model has made a mistake. We present a sequence of pre-registered experiments (N = 3, 800) in which we showed participants functionally identical models that varied only in two factors commonly thought to make machine learning models more or less interpretable: the number of features and the transparency of the model (i.e., whether the model internals are clear or black box). Predictably, participants who saw a clear model with few features could better simulate the model’s predictions. However, we did not find that participants more closely followed its predictions. Furthermore, showing participants a clear model meant that they were less able to detect and correct for the model’s sizable mistakes, seemingly due to information overload. These counterintuitive findings emphasize the importance of testing over intuition when developing interpretable models."])
 # print(abs_predictions)
@@ -242,11 +242,11 @@ print(predictions)
 # result = 1 - spatial.distance.cosine(predictions, abs_predictions)
 # print(result)
 
-# # Test accuracy 66.6%
-# # results = Siamese_test.evaluate(
-# # 	[test_data['base'].to_numpy(),test_data['pair'].to_numpy()],
-# # 	test_data['label'].to_numpy())
-# # print(results)
+# Test accuracy 66.6%
+# results = Siamese_test.evaluate(
+# 	[test_data['base'].to_numpy(),test_data['pair'].to_numpy()],
+# 	test_data['label'].to_numpy())
+# print(results)
 
 # papers = pd.read_csv('../data/papers.csv')
 # test = Siamese_test.predict(papers['abstract'].to_numpy())
@@ -259,3 +259,41 @@ print(predictions)
 
 
 # papers.to_csv('../data/papers.csv', index = False)
+
+# Test the file
+papers = pd.read_csv('data/papers.csv')
+papers['embedding'] = papers['embedding'].astype(object)
+
+
+test_sentence = "Model transparency might hinder users' ability to recognize the model’s serious error."
+embedding = Siamese_test.predict([test_sentence])[0]
+K_largest = []
+
+for idx, row in papers.iterrows():
+	abs_embedding = row['embedding']
+	abs_embedding = abs_embedding[1:]
+	abs_embedding = abs_embedding[:-1]
+	tmp = abs_embedding.split()
+	abs_embedding = []
+	for t in tmp:
+		abs_embedding.append(float(t))
+	abs_embedding = np.array(abs_embedding)
+
+	result = 1 - spatial.distance.cosine([embedding], [abs_embedding])
+	
+	if len(K_largest) < 5:
+		K_largest.append(tuple((result, row['paper_id'])))
+		K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
+	else:
+		if result > K_largest[4][0]:
+			K_largest[4] = tuple((result, row['paper_id']))
+			K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
+K_title = []
+for k, v in K_largest:
+	paper_title = papers[papers['paper_id'] == v]['title'].values[0]	
+	K_title.append(paper_title)
+
+print("Input: ", test_sentence)
+print("OUtput: ")
+for title in K_title:
+	print(title)
