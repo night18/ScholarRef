@@ -1,0 +1,15 @@
+beautifulsoup4
+Django
+djangorestframework
+nltk
+numpy
+pandas
+requests
+scholarly
+scikit_learn
+scipy
+selenium
+tensorflow
+tensorflow_gpu
+tensorflow_hub
+tensorflow_text
