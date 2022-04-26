@@ -136,7 +136,7 @@ def eucl_dist_output_shape(shapes):
 	return (shapes[0], shapes[2])
 
 def test_triplet(learning_rate=0.001):
-	h5_storage_path = "h5/triplet.h5"
+	h5_storage_path = "checkpoint/triplet.hdf5"
 	input_base = Input(shape=(), dtype=tf.string, name='base_text')
 	input_pair = Input(shape=(), dtype=tf.string, name='pair_text')
 
@@ -158,7 +158,6 @@ def test_triplet(learning_rate=0.001):
 	L2_layer = Lambda( lambda tensor: K.sqrt(K.sum(K.square(tensor[0]-tensor[1]), axis=1, keepdims=True )),  output_shape=eucl_dist_output_shape)
 
 	L2_distance = L2_layer([encode_base, encode_pair])
-	output = Activation('sigmoid')(L2_distance)
 
 	model = Model(
 			inputs = [input_base, input_pair],
@@ -173,7 +172,7 @@ def test_triplet(learning_rate=0.001):
 	return model
 
 def concept_encoder(learning_rate=0.001):
-	h5_storage_path = "h5/triplet.h5"
+	h5_storage_path = "checkpoint/triplet.hdf5"
 
 	input_base = Input(shape=(), dtype=tf.string, name='base_text')
 
@@ -204,49 +203,49 @@ def concept_encoder(learning_rate=0.001):
 	return model
 	
 
-data = pd.read_csv('../data/sentence_root.csv')
-train_data = data[0:1000]
-others = data[1000:]
+# data = pd.read_csv('../data/sentence_root.csv')
+# train_data = data[0:1000]
+# others = data[1000:]
 
-test_data = pd.DataFrame(columns={'base', 'pair', 'label'})
-for i, row in others.iterrows():
-	test_data = test_data.append({
-		'base':row['sentence'],
-		'pair': row['positive_abstract'],
-		'label': 0.0
-		}, ignore_index=True)
+# test_data = pd.DataFrame(columns={'base', 'pair', 'label'})
+# for i, row in others.iterrows():
+# 	test_data = test_data.append({
+# 		'base':row['sentence'],
+# 		'pair': row['positive_abstract'],
+# 		'label': 0.0
+# 		}, ignore_index=True)
 
-	test_data = test_data.append({
-		'base':row['sentence'],
-		'pair': row['negative_abstract'],
-		'label': 1.0
-		}, ignore_index=True)
+# 	test_data = test_data.append({
+# 		'base':row['sentence'],
+# 		'pair': row['negative_abstract'],
+# 		'label': 1.0
+# 		}, ignore_index=True)
 
-try:
-	# Siamese_test = test_triplet()
-	Siamese_test = concept_encoder()
-except Exception as e:
-	print(e)
-	train_triplet(train_data['sentence'].to_numpy(), train_data['positive_abstract'].to_numpy(), train_data['negative_abstract'].to_numpy(), epochs=30)
-	Siamese_test = concept_encoder()
-	# Siamese_test = test_triplet()
+# try:
+# 	# Siamese_test = test_triplet()
+# 	Siamese_test = concept_encoder()
+# except Exception as e:
+# 	print(e)
+# 	train_triplet(train_data['sentence'].to_numpy(), train_data['positive_abstract'].to_numpy(), train_data['negative_abstract'].to_numpy(), epochs=30)
+# 	Siamese_test = concept_encoder()
+# 	# Siamese_test = test_triplet()
 
 	
 # Siamese_test = concept_encoder()
-# predictions = Siamese_test.predict(["Model transparency might hinder users' ability to recognize the model’s serious error."])
-# print(predictions)
+# # predictions = Siamese_test.predict(["Model transparency might hinder users' ability to recognize the model’s serious error."])
+# # print(predictions)
 
-# abs_predictions = Siamese_test.predict(["With machine learning models being increasingly used to aid decision making even in high-stakes domains, there has been a growing interest in developing interpretable models. Although many supposedly interpretable models have been proposed, there have been relatively few experimental studies investigating whether these models achieve their intended effects, such as making people more closely follow a model’s predictions when it is beneficial for them to do so or enabling them to detect when a model has made a mistake. We present a sequence of pre-registered experiments (N = 3, 800) in which we showed participants functionally identical models that varied only in two factors commonly thought to make machine learning models more or less interpretable: the number of features and the transparency of the model (i.e., whether the model internals are clear or black box). Predictably, participants who saw a clear model with few features could better simulate the model’s predictions. However, we did not find that participants more closely followed its predictions. Furthermore, showing participants a clear model meant that they were less able to detect and correct for the model’s sizable mistakes, seemingly due to information overload. These counterintuitive findings emphasize the importance of testing over intuition when developing interpretable models."])
-# print(abs_predictions)
+# # abs_predictions = Siamese_test.predict(["With machine learning models being increasingly used to aid decision making even in high-stakes domains, there has been a growing interest in developing interpretable models. Although many supposedly interpretable models have been proposed, there have been relatively few experimental studies investigating whether these models achieve their intended effects, such as making people more closely follow a model’s predictions when it is beneficial for them to do so or enabling them to detect when a model has made a mistake. We present a sequence of pre-registered experiments (N = 3, 800) in which we showed participants functionally identical models that varied only in two factors commonly thought to make machine learning models more or less interpretable: the number of features and the transparency of the model (i.e., whether the model internals are clear or black box). Predictably, participants who saw a clear model with few features could better simulate the model’s predictions. However, we did not find that participants more closely followed its predictions. Furthermore, showing participants a clear model meant that they were less able to detect and correct for the model’s sizable mistakes, seemingly due to information overload. These counterintuitive findings emphasize the importance of testing over intuition when developing interpretable models."])
+# # print(abs_predictions)
 
-# result = 1 - spatial.distance.cosine(predictions, abs_predictions)
-# print(result)
+# # result = 1 - spatial.distance.cosine(predictions, abs_predictions)
+# # print(result)
 
-# Test accuracy 66.6%
-# results = Siamese_test.evaluate(
-# 	[test_data['base'].to_numpy(),test_data['pair'].to_numpy()],
-# 	test_data['label'].to_numpy())
-# print(results)
+# # Test accuracy 66.6%
+# # results = Siamese_test.evaluate(
+# # 	[test_data['base'].to_numpy(),test_data['pair'].to_numpy()],
+# # 	test_data['label'].to_numpy())
+# # print(results)
 
 # papers = pd.read_csv('../data/papers.csv')
 # test = Siamese_test.predict(papers['abstract'].to_numpy())
@@ -258,42 +257,42 @@ except Exception as e:
 # 	papers.at[idx, 'embedding'] = test[idx]
 
 
-# papers.to_csv('../data/papers.csv', index = False)
+# papers.to_csv('/triplet_enbedding_papers.csv', index = False)
 
-# Test the file
-papers = pd.read_csv('data/papers.csv')
-papers['embedding'] = papers['embedding'].astype(object)
+# # Test the file
+# # papers = pd.read_csv('data/papers.csv')
+# # papers['embedding'] = papers['embedding'].astype(object)
 
 
-test_sentence = "Model transparency might hinder users' ability to recognize the model’s serious error."
-embedding = Siamese_test.predict([test_sentence])[0]
-K_largest = []
+# test_sentence = "Model transparency might hinder users' ability to recognize the model’s serious error."
+# embedding = Siamese_test.predict([test_sentence])[0]
+# K_largest = []
 
-for idx, row in papers.iterrows():
-	abs_embedding = row['embedding']
-	abs_embedding = abs_embedding[1:]
-	abs_embedding = abs_embedding[:-1]
-	tmp = abs_embedding.split()
-	abs_embedding = []
-	for t in tmp:
-		abs_embedding.append(float(t))
-	abs_embedding = np.array(abs_embedding)
+# for idx, row in papers.iterrows():
+# 	abs_embedding = row['embedding']
+# 	abs_embedding = abs_embedding[1:]
+# 	abs_embedding = abs_embedding[:-1]
+# 	tmp = abs_embedding.split()
+# 	abs_embedding = []
+# 	for t in tmp:
+# 		abs_embedding.append(float(t))
+# 	abs_embedding = np.array(abs_embedding)
 
-	result = 1 - spatial.distance.cosine([embedding], [abs_embedding])
+# 	result = 1 - spatial.distance.cosine([embedding], [abs_embedding])
 	
-	if len(K_largest) < 5:
-		K_largest.append(tuple((result, row['paper_id'])))
-		K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
-	else:
-		if result > K_largest[4][0]:
-			K_largest[4] = tuple((result, row['paper_id']))
-			K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
-K_title = []
-for k, v in K_largest:
-	paper_title = papers[papers['paper_id'] == v]['title'].values[0]	
-	K_title.append(paper_title)
+# 	if len(K_largest) < 5:
+# 		K_largest.append(tuple((result, row['paper_id'])))
+# 		K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
+# 	else:
+# 		if result > K_largest[4][0]:
+# 			K_largest[4] = tuple((result, row['paper_id']))
+# 			K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
+# K_title = []
+# for k, v in K_largest:
+# 	paper_title = papers[papers['paper_id'] == v]['title'].values[0]	
+# 	K_title.append(paper_title)
 
-print("Input: ", test_sentence)
-print("OUtput: ")
-for title in K_title:
-	print(title)
+# print("Input: ", test_sentence)
+# print("OUtput: ")
+# for title in K_title:
+# 	print(title)
