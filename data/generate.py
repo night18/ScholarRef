@@ -10,7 +10,7 @@ sentences = pd.read_csv('sentence.csv')
 # Creat Training dataset
 sentence_root_data = pd.DataFrame(columns={'sentence', 'positive_abstract', 'negative_abstract'})
 
-for _, link in links.iterrows():
+for idx, link in links.iterrows():
 	sentence = sentences.loc[link['sentence_id']]['sentence']
 	positive = papers.loc[link['paper_id']]['abstract']
 	negative_id = papers[papers['paper_id'] != link['paper_id'] ].sample(n=1).first_valid_index()
@@ -19,7 +19,10 @@ for _, link in links.iterrows():
 	sentence_root_data = sentence_root_data.append({
 		'sentence':sentence,
 		'positive_abstract': positive,
-		'negative_abstract': negative
+		'negative_abstract': negative,
+		'sentence_id': link['sentence_id'],
+		'positive_id': link['paper_id'],
+		'negative_id': negative_id
 		}, ignore_index=True)
 	
 sentence_root_data = shuffle(sentence_root_data)

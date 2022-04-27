@@ -8,7 +8,7 @@ import random
 import re
 import nltk.data
 import numpy as np
-
+from webdriver_manager.chrome import ChromeDriverManager
 tokenizer = nltk.data.load('/home/chun/nltk_data/tokenizers/punkt/english.pickle')
 
 
@@ -16,7 +16,7 @@ urls = ['https://dl.acm.org/doi/proceedings/10.1145/3411764']
 collect_list = []
 
 for url in urls:
-	driver = webdriver.Chrome('/home/chun/chromedriver')
+	driver = webdriver.Chrome(ChromeDriverManager().install())
 	driver.implicitly_wait(10)
 	driver.get(url)
 	driver.implicitly_wait(5)
@@ -49,7 +49,7 @@ for url in urls:
 	# Access the paper
 	html = BeautifulSoup(driver.page_source, 'html.parser')
 	papers = html.select('.issue-item-container')
-
+	sentence_id = 0
 	for paper in papers:
 		link = paper.find('a', attrs={"data-title":'HTML'})
 
@@ -90,10 +90,12 @@ for url in urls:
 										reference = re.sub(r'  Navigate to.+', '', reference)
 										reference = re.sub(' ',' ',reference)
 										
-										collect_list.append({'sentence': sentence, 'reference': reference})
+										collect_list.append({'sentence': sentence, 'reference': reference, 'sentence_id':sentence_id})
 								except: 
 									print(link)
 									print(cite_nums)
+
+							sentence_id += 1
 
 					sleeping_time = random.randrange(7, 20)
 					time.sleep(sleeping_time)
