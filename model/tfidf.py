@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 include_conclusion = True
+topK = 10
 
 if include_conclusion:
 	paper = pd.read_csv('../data_asbtract_conclusion/papers.csv')
@@ -20,7 +21,7 @@ others = sentence_root[1000:]
 others = others.reset_index(drop=True)
 data = others[['sentence','sentence_id']]
 data = data.rename(columns={'sentence':'content', 'sentence_id': 'id'})
-
+print(len(data))
 # combine sentences with paper together
 combined = pd.concat([data, paper], ignore_index=True, sort=False)
 
@@ -29,14 +30,13 @@ tfidf_matrix = vectorizer.fit_transform(combined['content'])
 cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
 
 corect = 0
-print(cosine_sim)
 # Top 655 are sentences
 for idx, row in data.iterrows():
 	simi = cosine_sim[idx][655:].copy()
 	top5 = []
 
 	for simi_idx in range(len(simi)):
-		if len(top5) <= 10:
+		if len(top5) <= 5:
 			top5.append((simi[simi_idx], simi_idx))
 			top5 = sorted(top5, key=lambda x: x[0])
 		else:

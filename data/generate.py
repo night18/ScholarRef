@@ -11,8 +11,11 @@ sentences = pd.read_csv('sentence.csv')
 sentence_root_data = pd.DataFrame(columns={'sentence', 'positive_abstract', 'negative_abstract'})
 
 for idx, link in links.iterrows():
-	sentence = sentences.loc[link['sentence_id']]['sentence']
-	positive = papers.loc[link['paper_id']]['abstract']
+	sentence_row_index = sentences[sentences['sentence_id'] == link['sentence_id']].first_valid_index()
+	sentence = sentences.loc[sentence_row_index]['sentence']
+	
+	paper_row_index = papers[papers['paper_id'] == link['paper_id']].first_valid_index()
+	positive = papers.loc[paper_row_index]['abstract']
 	negative_id = papers[papers['paper_id'] != link['paper_id'] ].sample(n=1).first_valid_index()
 	negative = papers.loc[negative_id]['abstract']
 

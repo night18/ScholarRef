@@ -3,6 +3,7 @@ __pycache__/
 *$py.class
 *.log
 *.hdf5
+*.csv#
 
 local_settings.py
 npm-debug.log*
