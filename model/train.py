@@ -14,21 +14,7 @@ from model import *
 from scipy import spatial
 
 data = pd.read_csv('../data/sentence_root.csv')
-train_data = data[0:1000]
-others = data[1000:]
-
-test_data = pd.DataFrame(columns={'base', 'pair', 'label'})
-for i, row in others.iterrows():
-	test_data = test_data.append({
-		'base':row['sentence'],
-		'pair': row['positive_abstract'],
-		'label': 0.0
-		}, ignore_index=True)
-
-	test_data = test_data.append({
-		'base':row['sentence'],
-		'pair': row['negative_abstract'],
-		'label': 1.0
-		}, ignore_index=True)
+train_data = data
+# train_data = data[0:1000]
 
 train_triplet(train_data['sentence'].to_numpy(), train_data['positive_abstract'].to_numpy(), train_data['negative_abstract'].to_numpy(), epochs=30)

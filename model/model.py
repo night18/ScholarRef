@@ -41,11 +41,12 @@ def get_sentence_embeding(sentences):
 
 def sentence_model():
 	inputs = Input(shape=(768,))
-	x = Dense(16, name='dense_32')(inputs)
-	# x = Dropout(0.1, name='dropout_32')(x)
+	x = Dense(64, name='dense_32')(inputs)
+	x = Dropout(0.1, name='dropout_32')(x)
 	x = Activation( 'relu', name='relu_32' )(x)
-	x = Dense(100, name='dense_16')(x)
-	x = Activation( 'relu', name='relu_16' )(x)
+	x = Dense(768, name='dense_16')(x)
+	x = Dropout(0.1, name='dropout_16')(x)
+	x = Activation('relu', name='relu_16' )(x)
 
 	model = Model(
 		inputs = inputs,
@@ -76,7 +77,7 @@ def siamese_loss(yTrue, yPred):
 	return K.mean( (1-yTrue) * K.square(yPred) + yTrue * K.square(K.maximum(1 - yPred, 0)))
 
 
-def triplet_loss(y_true, y_pred, cosine=False, alpha=0.2):
+def triplet_loss(y_true, y_pred, cosine=False, alpha=0.5):
 	embedding_size = K.int_shape(y_pred)[-1] // 3
 	ind = int(embedding_size * 2)
 	a_pred = y_pred[:, :embedding_size]
@@ -256,8 +257,7 @@ def concept_encoder(learning_rate=0.001):
 # for idx, row in papers.iterrows():
 # 	papers.at[idx, 'embedding'] = test[idx]
 
-
-# papers.to_csv('/triplet_enbedding_papers.csv', index = False)
+# papers.to_csv('triplet_enbedding_papers.csv', index = False)
 
 # # Test the file
 # # papers = pd.read_csv('data/papers.csv')
