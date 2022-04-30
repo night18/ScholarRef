@@ -42,12 +42,11 @@ def get_sentence_embeding(sentences):
 def sentence_model():
 	inputs = Input(shape=(768,))
 	x = Dense(64, name='dense_32')(inputs)
-	x = Dropout(0.1, name='dropout_32')(x)
+	# x = Dropout(0.1, name='dropout_32')(x)
 	x = Activation( 'relu', name='relu_32' )(x)
-	x = Dense(768, name='dense_16')(x)
-	x = Dropout(0.1, name='dropout_16')(x)
-	x = Activation('relu', name='relu_16' )(x)
-
+	x = Dense(128, name='dense_128')(x)
+	# x = Dropout(0.1, name='dropout_128')(x)
+	x = Activation('tanh', name='relu_128' )(x)
 	model = Model(
 		inputs = inputs,
 		outputs = x
@@ -77,7 +76,7 @@ def siamese_loss(yTrue, yPred):
 	return K.mean( (1-yTrue) * K.square(yPred) + yTrue * K.square(K.maximum(1 - yPred, 0)))
 
 
-def triplet_loss(y_true, y_pred, cosine=False, alpha=0.5):
+def triplet_loss(y_true, y_pred, cosine=False, alpha=1):
 	embedding_size = K.int_shape(y_pred)[-1] // 3
 	ind = int(embedding_size * 2)
 	a_pred = y_pred[:, :embedding_size]

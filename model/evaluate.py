@@ -16,25 +16,21 @@ include_conclusion = False
 topK = 10
 
 if include_conclusion:
-	paper = pd.read_csv('../data_asbtract_conclusion/papers.csv')
 	sentence_root = pd.read_csv('../data_asbtract_conclusion/sentence_root.csv')
 	links = pd.read_csv('../data_asbtract_conclusion/links.csv')
 	embedding = pd.read_csv('./triplet_enbedding_papers.csv')
 else:
-	paper = pd.read_csv('../data/papers.csv')
 	sentence_root = pd.read_csv('../data/sentence_root.csv')
 	links = pd.read_csv('../data/links.csv')
 	embedding = pd.read_csv('./triplet_enbedding_papers.csv')
 
-paper = paper[['abstract','paper_id']]
-paper = paper.rename(columns={'abstract':'content', 'paper_id': 'id'})
-train_data = sentence_root[0:1000]
-others = sentence_root[1000:]
+
+train_data = sentence_root[0:9000]
+others = sentence_root[9000:]
 others = others.reset_index(drop=True)
 data = others[['sentence','sentence_id']]
-data = data.rename(columns={'sentence':'content', 'sentence_id': 'id'})
 
-Siamese_test = concept_encoder()
+# Siamese_test = concept_encoder()
 
 corect = 0
 count = 0
@@ -42,8 +38,8 @@ count = 0
 for idx, row in data.iterrows():
 	# print(row['id'])
 
-	test_sentence = row['content']
-	sentence_embedding = Siamese_test.predict([test_sentence])[0]
+	test_sentence = row['sentence']
+	sentence_embedding = tf.keras.backend.get_value(get_sentence_embeding([test_sentence]))[0]
 
 	K_largest = []
 
@@ -56,7 +52,7 @@ for idx, row in data.iterrows():
 		for t in tmp:
 			abs_embedding.append(float(t))
 		abs_embedding = np.array(abs_embedding)	
-		# if paper_row['paper_id'] == 178:
+		# if paper_row['paper_id'] == 32:
 		# 	print(sentence_embedding)
 		# 	print(abs_embedding)
 		# 	print(similarity)
@@ -72,15 +68,12 @@ for idx, row in data.iterrows():
 				K_largest = sorted(K_largest, key=lambda x: x[0])
 
 	
-	reference_list = links[links['sentence_id'] == row['id']]['paper_id'].tolist()
+	reference_list = links[links['sentence_id'] == row['sentence_id']]['paper_id'].tolist()
 	for top in K_largest:
 		if top[1] in reference_list:
 			corect += 1
 			break
 	# print(K_largest)
-
-	# if count == 0:
-	# 	break
 
 print("accuracy")
 print(corect / len(others.index))

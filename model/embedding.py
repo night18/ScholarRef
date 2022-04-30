@@ -15,13 +15,15 @@ from scipy import spatial
 
 Siamese_test = concept_encoder()
 papers = pd.read_csv('../data/papers.csv')
-test = Siamese_test.predict(papers['abstract'].to_numpy())
+# test = Siamese_test.predict(papers['abstract'].to_numpy())
 
 papers['embedding'] = np.nan
 papers['embedding'] = papers['embedding'].astype(object)
 
 for idx, row in papers.iterrows():
-	papers.at[idx, 'embedding'] = test[idx]
+	tensor = get_sentence_embeding([row['abstract']])
+	embed = tf.keras.backend.get_value(tensor)[0]
+	papers.at[idx, 'embedding'] = embed
 
 
 papers.to_csv('triplet_enbedding_papers.csv', index = False)

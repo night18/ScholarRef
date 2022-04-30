@@ -6,11 +6,14 @@ from sklearn.utils import shuffle
 links = pd.read_csv('links.csv')
 papers = pd.read_csv('papers.csv')
 sentences = pd.read_csv('sentence.csv')
+sample_size = 10000
 
 # Creat Training dataset
 sentence_root_data = pd.DataFrame(columns={'sentence', 'positive_abstract', 'negative_abstract'})
+sample_pool = links.sample(n = sample_size, replace=True, random_state=1)
 
-for idx, link in links.iterrows():
+
+for _, link in sample_pool.iterrows():
 	sentence_row_index = sentences[sentences['sentence_id'] == link['sentence_id']].first_valid_index()
 	sentence = sentences.loc[sentence_row_index]['sentence']
 	

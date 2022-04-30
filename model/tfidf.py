@@ -32,6 +32,7 @@ cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
 corect = 0
 # Top 655 are sentences
 for idx, row in data.iterrows():
+	is_found = False
 	simi = cosine_sim[idx][655:].copy()
 	top5 = []
 
@@ -50,6 +51,8 @@ for idx, row in data.iterrows():
 			corect += 1
 			break
 
+	data.loc[idx, 'is_found'] = is_found
 
 print("accuracy")
 print(corect / len(others.index))
+data.to_csv('tfidf_found.csv', index=False)
