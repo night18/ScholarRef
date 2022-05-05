@@ -2,22 +2,29 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-include_conclusion = False
+option = 1
+include_conclusion = True
 topK = 10
 
-if include_conclusion:
-	paper = pd.read_csv('../data_asbtract_conclusion/papers.csv')
+if option == 1:
 	sentence_root = pd.read_csv('../data_asbtract_conclusion/sentence_root.csv')
 	links = pd.read_csv('../data_asbtract_conclusion/links.csv')
-else:
-	paper = pd.read_csv('../data/papers.csv')
+	paper = pd.read_csv('../data_asbtract_conclusion/papers.csv')
+elif option == 2:
 	sentence_root = pd.read_csv('../data/sentence_root.csv')
 	links = pd.read_csv('../data/links.csv')
+	paper = pd.read_csv('../data/papers.csv')
+	
+elif option == 3:
+	sentence_root = pd.read_csv('../data_title/sentence_root.csv')
+	links = pd.read_csv('../data_title/links.csv')
+	paper = pd.read_csv('../data_title/papers.csv')
+	
+
 
 paper = paper[['abstract','paper_id']]
 paper = paper.rename(columns={'abstract':'content', 'paper_id': 'id'})
-train_data = sentence_root[0:1000]
-others = sentence_root[1000:]
+others = sentence_root
 others = others.reset_index(drop=True)
 data = others[['sentence','sentence_id']]
 data = data.rename(columns={'sentence':'content', 'sentence_id': 'id'})
@@ -33,7 +40,7 @@ corect = 0
 # Top 655 are sentences
 for idx, row in data.iterrows():
 	is_found = False
-	simi = cosine_sim[idx][655:].copy()
+	simi = cosine_sim[idx][1655:].copy()
 	top5 = []
 
 	for simi_idx in range(len(simi)):

@@ -4,17 +4,21 @@ from scipy import spatial
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
-include_conclusion = False
+option = 2
 topK = 10
 
-if include_conclusion:
+if option == 1:
 	sentence_root = pd.read_csv('../data_asbtract_conclusion/sentence_root.csv')
 	links = pd.read_csv('../data_asbtract_conclusion/links.csv')
 	abstract_sbert = pd.read_csv('./abstract_conclusion_sbert.csv')
-else:
+elif option == 2:
 	sentence_root = pd.read_csv('../data/sentence_root.csv')
 	links = pd.read_csv('../data/links.csv')
 	abstract_sbert = pd.read_csv('./abstract_sbert.csv')
+elif option == 3:
+	sentence_root = pd.read_csv('../data_title/sentence_root.csv')
+	links = pd.read_csv('../data_title/links.csv')
+	abstract_sbert = pd.read_csv('./title_sbert.csv')
 
 
 others = sentence_root
@@ -60,7 +64,7 @@ for idx, s_ebd in enumerate(sentence_embeddings):
 
 
 print("accuracy")
-# 54.19% without conclusion
+# 54.49% without conclusion
 # 54.96% with conclusion
 print(corect / len(others.index))
 others.to_csv('sbert_found.csv', index=False)
