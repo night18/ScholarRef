@@ -9,7 +9,7 @@ topK = 10
 abstract_sbert = pd.read_csv('./abstract_sbert.csv')
 
 
-test_sentence = "the shunt current mainly changes in accordance with the impedance of the path from the touch surface to the gnd."
+test_sentence = "built upon the flexible composition of visual encoding for expressive visualizations"
 
 
 s_ebd = model.encode([test_sentence])[0]
@@ -35,6 +35,9 @@ for paper_idx, paper_row in abstract_sbert.iterrows():
 			K_largest[0] = tuple((similarity, paper_row['paper_id']))
 			K_largest = sorted(K_largest, key=lambda x: x[0])
 
-
+K_largest = sorted(K_largest, key=lambda x: x[0], reverse=True)
+print("input sentence: ", test_sentence)
+print("")
+print("The most related papers:")
 for pred in K_largest:
 	print(abstract_sbert[abstract_sbert['paper_id'] == pred[1]].iloc[0]['title'])
